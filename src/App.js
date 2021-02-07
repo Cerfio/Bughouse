@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 let rules = require('./rules.json');
 
+let turnFirstBoard = 'white';
+
 class App extends React.Component {
 	constructor(props) {
 		super(props);
@@ -24,6 +26,22 @@ class App extends React.Component {
 			}
 		};
 	};
+	selectPiece(cellX, cellY) {
+		let colorPlayer = '';
+		const { piecesWhite, piecesBlack } = this.state;
+
+		if (turnFirstBoard === 'black')
+			colorPlayer = piecesBlack;
+		if (turnFirstBoard === 'white')
+			colorPlayer = piecesWhite;
+		Object.keys(colorPlayer).map((piece) => {
+			for (let i = 0; i !== colorPlayer[piece].length; i++) {
+				const { x, y } = colorPlayer[piece][i];
+				if (cellX === x && cellY === y)
+					console.log(piece);
+			}
+		});
+	}
 	initPieces() {
 		Object.keys(rules).map((piece) => {
 			const position = rules[piece].position;
@@ -46,9 +64,9 @@ class App extends React.Component {
 			const newRow = [];
 			for (let cell = 0; cell !== numberCell; cell++) {
 				if ((cell + row) % 2)
-					newRow.push(<div style={{ width: '50px', height: '50px', backgroundColor: '#b58862' }}></div>);
+					newRow.push(<div onClick={() => this.selectPiece(cell + 1, row + 1)} style={{ width: '50px', height: '50px', backgroundColor: '#b58862' }}></div>);
 				else
-					newRow.push(<div style={{ width: '50px', height: '50px', backgroundColor: '#F0D9B5' }}></div>);
+					newRow.push(<div onClick={() => this.selectPiece(cell + 1, row + 1)} style={{ width: '50px', height: '50px', backgroundColor: '#F0D9B5' }}></div>);
 			};
 			copyBoard[row] = newRow;
 			this.setState({
@@ -59,10 +77,11 @@ class App extends React.Component {
 	refreshMap() {
 		const { piecesWhite, piecesBlack } = this.state;
 
+		console.log(this.state.board)
 		Object.keys(piecesWhite).map((piece) => {
 			for (let i = 0; i !== piecesWhite[piece].length; i++) {
 			 	const { x, y } = piecesWhite[piece][i];
-			 	this.state.board[y - 1][x - 1].props.style['backgroundImage'] = `url(${rules[piece].image_white})`;
+				this.state.board[y - 1][x - 1].props.style['backgroundImage'] = `url(${rules[piece].image_white})`;
 			}
 		});
 		Object.keys(piecesBlack).map((piece) => {
