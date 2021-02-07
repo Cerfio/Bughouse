@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 let rules = require('./rules.json');
-// [{
-// 	position: {
-// 		x: 0,
-// 		y: 0,
-// 	},
-// 	image: ''
-// }]
 
 class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			board: [],
-			pieces: {
+			piecesWhite: {
+				pawn: [],
+				knight: [],
+				bishop: [],
+				rook: [],
+				queen: [],
+				king: [],
+			},
+			piecesBlack: {
 				pawn: [],
 				knight: [],
 				bishop: [],
@@ -28,13 +29,16 @@ class App extends React.Component {
 			const position = rules[piece].position;
 
 			for (let i = 0; i !== rules[piece].number; i++) {
-				this.state.pieces[piece].push({
+				this.state.piecesWhite[piece].push({
+					x: i === 0 ? position.x : (position.x -10 + i) * -1,
+					y: - position.y + 9
+				});
+				this.state.piecesBlack[piece].push({
 					x: i === 0 ? position.x : (position.x -10 + i) * -1,
 					y: position.y
 				});
 			}
 		})
-		console.log(this.state.pieces)
 	}
 	initBoard(numberRow = 8, numberCell = 8) {
 		for (let row = 0; row !== numberRow; row++) {
@@ -52,9 +56,26 @@ class App extends React.Component {
 			})
 		}
 	}
+	refreshMap() {
+		const { piecesWhite, piecesBlack } = this.state;
+
+		Object.keys(piecesWhite).map((piece) => {
+			for (let i = 0; i !== piecesWhite[piece].length; i++) {
+			 	const { x, y } = piecesWhite[piece][i];
+			 	this.state.board[y - 1][x - 1].props.style['backgroundImage'] = `url(${rules[piece].image_white})`;
+			}
+		});
+		Object.keys(piecesBlack).map((piece) => {
+			for (let i = 0; i !== piecesBlack[piece].length; i++) {
+			 	const { x, y } = piecesBlack[piece][i];
+			 	this.state.board[y - 1][x - 1].props.style['backgroundImage'] = `url(${rules[piece].image_black})`;
+			}
+		});
+	}
 	componentDidMount() {
 		this.initBoard();
 		this.initPieces();
+		this.refreshMap();
 	};
 	render() {
 		return (
